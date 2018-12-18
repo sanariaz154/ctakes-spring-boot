@@ -57,31 +57,6 @@ public class CtakesService {
 
 	public CtakesService() throws Exception {
 		jcas = JCasFactory.createJCas();
-		/*switch (pipeline) {
-		case "FAST":
-			aed = MyClinicalPipelineFactory.getFastPipeline();
-			break;
-		case "DEFAULT":
-			aed = MyClinicalPipelineFactory.getCda2Pipeline();
-			break;
-		case "NP":
-			aed = MyClinicalPipelineFactory.getNpChunkerPipeline();
-			break;
-		case "COREF":
-			aed = MyClinicalPipelineFactory.getCoreferencePipeline();
-			break;
-		case "PARSE":
-			aed = MyClinicalPipelineFactory.getParsingPipeline();
-			break;
-		case "CHUNK":
-			aed = MyClinicalPipelineFactory.getStandardChunkAdjusterAnnotator();
-			break;
-		case "TOKEN":
-			aed = MyClinicalPipelineFactory.getTokenProcessingPipeline();
-			break;
-		default:
-			aed = MyClinicalPipelineFactory.getDefaultPipeline();
-		}*/
 		aed = MyPipeline.getAggregateBuilder();
 	}
 
@@ -100,17 +75,15 @@ public class CtakesService {
 		jcs.setPrettyPrint(true);
 		
 		
-		// do some configuration
         jcs.setJsonContext(JsonCasSerializer.JsonContextFormat.omitSubtypes);
         jcs.setJsonContext(JsonCasSerializer.JsonContextFormat.omitContext);
         jcs.setJsonContext(JsonCasSerializer.JsonContextFormat.omitExpandedTypeNames);
-
 		StringWriter sw = new StringWriter();
-		jcs.serialize(cas, sw); // serialize into sw
-		//return jsonClinical(sw.toString(), note);
-		 return sw.toString();
+		jcs.serialize(cas, sw); 
+		return jsonClinical(sw.toString(), note);
 	}
 
+	@SuppressWarnings("unchecked")
 	public String jsonClinical(String ctakes, String note) throws Exception {
 		JSONParser jsonParser = new JSONParser();
 		JSONObject obj = new JSONObject();
@@ -126,12 +99,7 @@ public class CtakesService {
 		
 		//alihur edits - obj = (JSONObject) obj.get("_InitialView");
 		
-		//sana's edit
-		//JSONArray TimeMention = (JSONArray) obj.get("TimeMention"); // time is in long.....
 		JSONArray MeasurementAnnotation = (JSONArray) obj.get("MeasurementAnnotation");
-		
-		// ----
-		
 		JSONArray MedicationMention = (JSONArray) obj.get("MedicationMention");
 		JSONArray AnatomicalSiteMention = (JSONArray) obj.get("AnatomicalSiteMention");
 		JSONArray DiseaseDisorderMention = (JSONArray) obj.get("DiseaseDisorderMention");
@@ -140,79 +108,34 @@ public class CtakesService {
 		JSONArray WordToken = (JSONArray) obj.get("WordToken");
 
 		JSONObject output = new JSONObject();
-		//////////////////////
-		
-		
-		//obj = (JSONObject) obj.get("_views");
-		//obj = (JSONObject) obj.get("plaintext");
-		//obj = (JSONObject) obj.get("_InitialView");
-		//JSONArray MedicationMention = (JSONArray) obj.get("MedicationMention");
-		//JSONArray AnatomicalSiteMention = (JSONArray) obj.get("AnatomicalSiteMention");
-		//JSONArray DiseaseDisorderMention = (JSONArray) obj.get("DiseaseDisorderMention");
-		//JSONArray SignSymptomMention = (JSONArray) obj.get("SignSymptomMention");
-		//JSONArray ProcedureMention = (JSONArray) obj.get("ProcedureMention");
-		//JSONArray WordToken = (JSONArray) obj.get("WordToken");
 	
+	//Sana's Edits 
+		// this is only needed to show you original text in the following annotations. You can add other annotation types too. 		
+		// Note: all these changes are made in 'initial_view' obj in order to show others annotations too
+		 
 		
-	/*	JSONArray EventMention = (JSONArray) obj.get("EventMention");
-		JSONArray Predicate = (JSONArray) obj.get("Predicate");
-		JSONArray SemanticArgument = (JSONArray) obj.get("SemanticArgument");
-		JSONArray SemanticRoleRelation = (JSONArray) obj.get("SemanticRoleRelation");
-		JSONArray RelationArgument = (JSONArray) obj.get("RelationArgument");
-		JSONArray TemporalTextRelation = (JSONArray) obj.get("TemporalTextRelation");
-		JSONArray EventProperties = (JSONArray) obj.get("EventProperties");
-		//JSONArray MeasurementAnnotation = (JSONArray) obj.get("MeasurementAnnotation");
-		JSONArray Event = (JSONArray) obj.get("Event");
-		//JSONArray TimeMention = (JSONArray) obj.get("TimeMention");
-		JSONArray RomanNumeralAnnotation = (JSONArray) obj.get("RomanNumeralAnnotation");
-
-		JSONObject output = new JSONObject();
-
-       
 		if(MedicationMention!=null)
-		output.put("MedicationMention", parseJsonMention(note, WordToken, MedicationMention));
+		obj.put("MedicationMention", parseJsonMention(note, WordToken, MedicationMention));
 		if(AnatomicalSiteMention!=null)
-		output.put("AnatomicalSiteMention", parseJsonMention(note, WordToken, AnatomicalSiteMention));
+		obj.put("AnatomicalSiteMention", parseJsonMention(note, WordToken, AnatomicalSiteMention));
 		if(DiseaseDisorderMention!=null)
-		output.put("DiseaseDisorderMention", parseJsonMention(note, WordToken, DiseaseDisorderMention));
+		obj.put("DiseaseDisorderMention", parseJsonMention(note, WordToken, DiseaseDisorderMention));
 		if(SignSymptomMention!=null)
-		output.put("SignSymptomMention", parseJsonMention(note, WordToken, SignSymptomMention));
+		obj.put("SignSymptomMention", parseJsonMention(note, WordToken, SignSymptomMention));
 		if(ProcedureMention!=null)
-		output.put("ProcedureMention", parseJsonMention(note, WordToken, ProcedureMention));
-
-    
-		if(EventMention!=null)
-		output.put("EventMention", parseJsonMention(note, WordToken, EventMention));
-		if(Predicate!=null)
-		output.put("Predicate", parseJsonMention(note, WordToken, Predicate));
-		if(SemanticArgument!=null)
-		output.put("SemanticArgument", parseJsonMention(note, WordToken, SemanticArgument));
-		if(SemanticRoleRelation!=null)
-		output.put("SemanticRoleRelation", parseJsonMention(note, WordToken, SemanticRoleRelation));
-		if(RelationArgument!=null)
-		output.put("RelationArgument", parseJsonMention(note, WordToken, RelationArgument));
-		if(TemporalTextRelation!=null)
-		output.put("TemporalTextRelation", parseJsonMention(note, WordToken, TemporalTextRelation));
-		if(EventProperties!=null)
-		output.put("EventProperties", parseJsonMention(note, WordToken, EventProperties));
+		obj.put("ProcedureMention", parseJsonMention(note, WordToken, ProcedureMention));
 		if(MeasurementAnnotation!=null)
-		output.put("MeasurementAnnotation", parseJsonMention(note, WordToken, MeasurementAnnotation));
-		if(Event!=null)
-		output.put("Event", parseJsonMention(note, WordToken, Event));
-		if(TimeMention!=null)
-		output.put("TimeMention", parseJsonMention(note, WordToken, TimeMention));
-		if(RomanNumeralAnnotation!=null)
-		output.put("RomanNumeralAnnotation", parseJsonMention(note, WordToken, RomanNumeralAnnotation));
-
-		
-		///////////////////////////
-		
-	*/	
+		  obj.put("MeasurementAnnotation", parseJsonMention(note, WordToken, MeasurementAnnotation));
+			
 		
 		output.put("Original", obj);
-		
-		
+			
 		return output.toJSONString();
+		
+		
+		// for relation references, CAS_Top object is needed. uncomment this line in that case 
+		
+		//return ctakes;      
 	}
 
 	private JSONArray parseJsonMention(String document, JSONArray wordtoken, JSONArray jsonArray) throws Exception {
@@ -220,6 +143,7 @@ public class CtakesService {
 		JSONArray output = new JSONArray();
 	
 			for (int i = 0, size = jsonArray.size(); i < size; i++) {
+				// this check is needed if you want to add "original_text" attribue for other annotators too
 				if(!(jsonArray.get(i) instanceof JSONObject))
 				  continue;
 				JSONObject objectInArray = (JSONObject) jsonArray.get(i);
@@ -241,6 +165,17 @@ public class CtakesService {
 			}
 			return output;
 	
+	}
+	
+	
+	private String dummyFunction(String jsonString, String note) {
+		
+		
+		
+		return jsonString;
+		
+		
+		
 	}
 
 }
