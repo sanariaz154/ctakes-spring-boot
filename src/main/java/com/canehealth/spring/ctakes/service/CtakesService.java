@@ -100,6 +100,7 @@ public class CtakesService {
 		//alihur edits - obj = (JSONObject) obj.get("_InitialView");
 		
 		JSONArray MeasurementAnnotation = (JSONArray) obj.get("MeasurementAnnotation");
+		JSONArray DrugMentionAnnotation = (JSONArray) obj.get("DrugMentionAnnotation");
 		JSONArray MedicationMention = (JSONArray) obj.get("MedicationMention");
 		JSONArray AnatomicalSiteMention = (JSONArray) obj.get("AnatomicalSiteMention");
 		JSONArray DiseaseDisorderMention = (JSONArray) obj.get("DiseaseDisorderMention");
@@ -116,6 +117,8 @@ public class CtakesService {
 		
 		if(MedicationMention!=null)
 		obj.put("MedicationMention", parseJsonMention(note, WordToken, MedicationMention));
+		if(DrugMentionAnnotation!=null)
+			obj.put("DrugMentionAnnotation", parseJsonMention(note, WordToken, DrugMentionAnnotation));
 		if(AnatomicalSiteMention!=null)
 		obj.put("AnatomicalSiteMention", parseJsonMention(note, WordToken, AnatomicalSiteMention));
 		if(DiseaseDisorderMention!=null)
@@ -135,7 +138,7 @@ public class CtakesService {
 		
 		// for relation references, CAS_Top object is needed. uncomment this line in that case 
 		
-		//return ctakes;      
+	//	return ctakes;      
 	}
 
 	private JSONArray parseJsonMention(String document, JSONArray wordtoken, JSONArray jsonArray) throws Exception {

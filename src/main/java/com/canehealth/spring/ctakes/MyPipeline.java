@@ -25,6 +25,8 @@ import java.io.FileNotFoundException;
 import org.apache.ctakes.assertion.medfacts.cleartk.PolarityCleartkAnalysisEngine;
 import org.apache.ctakes.assertion.medfacts.cleartk.UncertaintyCleartkAnalysisEngine;
 import org.apache.ctakes.chunker.ae.Chunker;
+import org.apache.ctakes.relationextractor.pipelines.*;
+import org.apache.ctakes.relationextractor.ae.*;
 import org.apache.ctakes.clinicalpipeline.ClinicalPipelineFactory;
 import org.apache.ctakes.constituency.parser.ae.ConstituencyParser;
 import org.apache.ctakes.contexttokenizer.ae.ContextDependentTokenizerAnnotator;
@@ -38,6 +40,10 @@ import org.apache.ctakes.dependency.parser.ae.ClearNLPSemanticRoleLabelerAE;
 import org.apache.ctakes.dictionary.lookup2.ae.AbstractJCasTermAnnotator;
 import org.apache.ctakes.dictionary.lookup2.ae.DefaultJCasTermAnnotator;
 import org.apache.ctakes.dictionary.lookup2.ae.JCasTermAnnotator;
+import org.apache.ctakes.drugner.DrugMention;
+import org.apache.ctakes.drugner.DrugModel;
+import org.apache.ctakes.drugner.ae.DrugMentionAnnotator;
+import com.canehealth.spring.ctakes.service.myDrugMentionAnnotator;
 import org.apache.ctakes.lvg.ae.LvgAnnotator;
 import org.apache.ctakes.postagger.POSTagger;
 import org.apache.ctakes.temporal.ae.BackwardsTimeAnnotator;
@@ -78,7 +84,6 @@ public class MyPipeline {
 	      builder.add( POSTagger.createAnnotatorDescription() );
 	      builder.add( Chunker.createAnnotatorDescription() );
 	      builder.add( ClinicalPipelineFactory.getStandardChunkAdjusterAnnotator() );
-
 	      builder.add( AnalysisEngineFactory.createEngineDescription( CopyNPChunksToLookupWindowAnnotations.class ) );
 	      builder.add( AnalysisEngineFactory.createEngineDescription( RemoveEnclosedLookupWindows.class ) );
 	      builder.add( AnalysisEngineFactory.createEngineDescription( DefaultJCasTermAnnotator.class,
@@ -86,14 +91,19 @@ public class MyPipeline {
 	               "org.apache.ctakes.typesystem.type.textspan.Sentence",
 	               JCasTermAnnotator.DICTIONARY_DESCRIPTOR_KEY,
 	               "org/apache/ctakes/dictionary/lookup/fast/sno_rx_16ab.xml")
-	      );
+	      );	
+			
+	      builder.add( AnalysisEngineFactory.createEngineDescription( myDrugMentionAnnotator.class ) );	
+	      builder.add( AnalysisEngineFactory.createEngineDescription( RelationExtractorAnnotator.class ) );	
+				
 	      builder.add( ClearNLPDependencyParserAE.createAnnotatorDescription() );
 	      builder.add( PolarityCleartkAnalysisEngine.createAnnotatorDescription() );
 	      builder.add( UncertaintyCleartkAnalysisEngine.createAnnotatorDescription() );
 	      builder.add( AnalysisEngineFactory.createEngineDescription( ClearNLPSemanticRoleLabelerAE.class ) );
 	      builder.add( AnalysisEngineFactory.createEngineDescription( ConstituencyParser.class ) );
-	      	
-			// Add BackwardsTimeAnnotator
+	   //   builder.add( AnalysisEngineFactory.createEngineDescription( RelationExtractorAnnotator.class ) );
+	  //    builder.add( AnalysisEngineFactory.createEngineDescription( LocationOfRelationExtractorAnnotator.class ) );
+	      	// Add BackwardsTimeAnnotator
 			builder.add(BackwardsTimeAnnotator
 					.createAnnotatorDescription("/org/apache/ctakes/temporal/ae/timeannotator/model.jar"));
 			// Add EventAnnotator
