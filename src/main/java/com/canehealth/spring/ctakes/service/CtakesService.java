@@ -98,9 +98,10 @@ public class CtakesService {
 		
 		
 		//alihur edits - obj = (JSONObject) obj.get("_InitialView");
-		
+		JSONArray StrengthAnnotation = (JSONArray) obj.get("StrengthAnnotation");
+		JSONArray FormAnnotation = (JSONArray) obj.get("FormAnnotation");
 		JSONArray MeasurementAnnotation = (JSONArray) obj.get("MeasurementAnnotation");
-		JSONArray DrugMentionAnnotation = (JSONArray) obj.get("DrugMentionAnnotation");
+		JSONArray DrugChangeStatusAnnotation = (JSONArray) obj.get("DrugChangeStatusAnnotation");
 		JSONArray MedicationMention = (JSONArray) obj.get("MedicationMention");
 		JSONArray AnatomicalSiteMention = (JSONArray) obj.get("AnatomicalSiteMention");
 		JSONArray DiseaseDisorderMention = (JSONArray) obj.get("DiseaseDisorderMention");
@@ -114,11 +115,14 @@ public class CtakesService {
 		// this is only needed to show you original text in the following annotations. You can add other annotation types too. 		
 		// Note: all these changes are made in 'initial_view' obj in order to show others annotations too
 		 
-		
+		if(StrengthAnnotation!=null)
+			obj.put("StrengthAnnotation", parseJsonMention(note, WordToken, StrengthAnnotation));
+		if(FormAnnotation!=null)
+		obj.put("FormAnnotation", parseJsonMention(note, WordToken, FormAnnotation));
 		if(MedicationMention!=null)
-		obj.put("MedicationMention", parseJsonMention(note, WordToken, MedicationMention));
-		if(DrugMentionAnnotation!=null)
-			obj.put("DrugMentionAnnotation", parseJsonMention(note, WordToken, DrugMentionAnnotation));
+			obj.put("MedicationMention", parseJsonMention(note, WordToken, MedicationMention));
+		if(DrugChangeStatusAnnotation!=null)
+			obj.put("DrugChangeStatusAnnotation", parseJsonMention(note, WordToken, DrugChangeStatusAnnotation));
 		if(AnatomicalSiteMention!=null)
 		obj.put("AnatomicalSiteMention", parseJsonMention(note, WordToken, AnatomicalSiteMention));
 		if(DiseaseDisorderMention!=null)

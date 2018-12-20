@@ -92,18 +92,24 @@ public class MyPipeline {
 	               JCasTermAnnotator.DICTIONARY_DESCRIPTOR_KEY,
 	               "org/apache/ctakes/dictionary/lookup/fast/sno_rx_16ab.xml")
 	      );	
-			
+		// new edit {drugner}	
 	      builder.add( AnalysisEngineFactory.createEngineDescription( myDrugMentionAnnotator.class ) );	
-	      builder.add( AnalysisEngineFactory.createEngineDescription( RelationExtractorAnnotator.class ) );	
+	//      builder.add( AnalysisEngineFactory.createEngineDescription( RelationExtractorAnnotator.class ) );	
 				
 	      builder.add( ClearNLPDependencyParserAE.createAnnotatorDescription() );
 	      builder.add( PolarityCleartkAnalysisEngine.createAnnotatorDescription() );
 	      builder.add( UncertaintyCleartkAnalysisEngine.createAnnotatorDescription() );
 	      builder.add( AnalysisEngineFactory.createEngineDescription( ClearNLPSemanticRoleLabelerAE.class ) );
 	      builder.add( AnalysisEngineFactory.createEngineDescription( ConstituencyParser.class ) );
-	   //   builder.add( AnalysisEngineFactory.createEngineDescription( RelationExtractorAnnotator.class ) );
-	  //    builder.add( AnalysisEngineFactory.createEngineDescription( LocationOfRelationExtractorAnnotator.class ) );
-	      	// Add BackwardsTimeAnnotator
+	      
+	      // new edit {relation}
+	      builder.add(BackwardsTimeAnnotator
+					.createAnnotatorDescription("/org/apache/ctakes/relationextractor/models/degree_of/model.jar"));
+	      builder.add(BackwardsTimeAnnotator
+					.createAnnotatorDescription("/org/apache/ctakes/relationextractor/models/location_of/model.jar"));
+	      
+	      builder.add( AnalysisEngineFactory.createEngineDescription( RelationExtractorConsumer.class ) );
+	     	// Add BackwardsTimeAnnotator
 			builder.add(BackwardsTimeAnnotator
 					.createAnnotatorDescription("/org/apache/ctakes/temporal/ae/timeannotator/model.jar"));
 			// Add EventAnnotator
@@ -128,7 +134,8 @@ public class MyPipeline {
 //	      builder.add( HistoryCleartkAnalysisEngine.createAnnotatorDescription() );
 //	      builder.add( ConditionalCleartkAnalysisEngine.createAnnotatorDescription() );
 //	      builder.add( GenericCleartkAnalysisEngine.createAnnotatorDescription() );
-//	      builder.add( SubjectCleartkAnalysisEngine.createAnnotatorDescription() );		
+//	      builder.add( SubjectCleartkAnalysisEngine.createAnnotatorDescription() );	
+			
 		return builder.createAggregateDescription();
 	}
 
