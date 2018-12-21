@@ -63,7 +63,10 @@ public class CtakesService {
 	public CtakesService() throws Exception {
 		jcas = JCasFactory.createJCas();
 		aed = MyPipeline.getAggregateBuilder();
+		//Sana's Edit: Relation pipeline
 		red = MyPipeline.getRelationBuilder();
+		//Sana Edit : Temp
+	//	fed= MyPipeline.getFASTUMLS();
 	}
 
 	@CacheEvict(allEntries = true)
@@ -75,15 +78,19 @@ public class CtakesService {
 		jcas.reset();
 		jcas.setDocumentText(note);
 		SimplePipeline.runPipeline(jcas, aed);
+	
+		//SimplePipeline.runPipeline(jcas, fed);
 		SimplePipeline.runPipeline(jcas, red);
+		
+		
 		CAS cas = jcas.getCas();
 		JsonCasSerializer jcs = new JsonCasSerializer();
 		jcs.setPrettyPrint(true);
 		
 		
-        jcs.setJsonContext(JsonCasSerializer.JsonContextFormat.omitSubtypes);
-        jcs.setJsonContext(JsonCasSerializer.JsonContextFormat.omitContext);
-        jcs.setJsonContext(JsonCasSerializer.JsonContextFormat.omitExpandedTypeNames);
+    //    jcs.setJsonContext(JsonCasSerializer.JsonContextFormat.omitSubtypes);
+     //   jcs.setJsonContext(JsonCasSerializer.JsonContextFormat.omitContext);
+      //  jcs.setJsonContext(JsonCasSerializer.JsonContextFormat.omitExpandedTypeNames);
 		StringWriter sw = new StringWriter();
 		jcs.serialize(cas, sw); 
 		return jsonClinical(sw.toString(), note);
@@ -125,7 +132,7 @@ public class CtakesService {
 		JSONArray WordToken = (JSONArray) obj.get("WordToken");
 
 		JSONObject output = new JSONObject();
-	RelationExtractorAnnotator
+	
 	//Sana's Edits 
 		// this is only needed to show you original text in the following annotations. You can add other annotation types too. 		
 		// Note: all these changes are made in 'initial_view' obj in order to show others annotations too
@@ -152,12 +159,12 @@ public class CtakesService {
 		
 		output.put("Original", obj);
 			
-		//return output.toJSONString();
+		return output.toJSONString();
 		
 		
 		// for relation references, CAS_Top object is needed. uncomment this line in that case 
 		
-		return ctakes;      
+		//return ctakes;      
 	}
 
 	private JSONArray parseJsonMention(String document, JSONArray wordtoken, JSONArray jsonArray) throws Exception {

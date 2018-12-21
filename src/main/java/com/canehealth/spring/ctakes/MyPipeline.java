@@ -86,8 +86,11 @@ public class MyPipeline {
 		return  builder.createAggregateDescription();
 	}
 	// --
-	
-	
+	//Sana's Edit : Temp
+	public static AnalysisEngineDescription getFASTUMLS() throws Exception {
+		return AnalysisEngineFactory.createEngineDescription(
+				"desc/ctakes-clinical-pipeline/desc/analysis_engine/myAggregatePlaintextFastUMLSProcessor");
+	}
 	
 	public static AnalysisEngineDescription getAggregateBuilder() throws Exception {
 		AggregateBuilder builder = new AggregateBuilder();
@@ -110,7 +113,10 @@ public class MyPipeline {
 	               "org/apache/ctakes/dictionary/lookup/fast/sno_rx_16ab.xml")
 	      );	
 		// new edit {drugner}	
-	      builder.add( AnalysisEngineFactory.createEngineDescription( myDrugMentionAnnotator.class ) );	
+	      
+	      builder.add( AnalysisEngineFactory.createEngineDescription(
+					"desc/ctakes-drug-ner/desc/analysis_engine/myDrugMentionAnnotator") );
+	      //builder.add( AnalysisEngineFactory.createEngineDescription( myDrugMentionAnnotator.class ) );	
 	//      builder.add( AnalysisEngineFactory.createEngineDescription( RelationExtractorAnnotator.class ) );	
 				
 	      builder.add( ClearNLPDependencyParserAE.createAnnotatorDescription() );
