@@ -9,6 +9,11 @@ package com.canehealth.spring.ctakes.service;
 import akka.actor.ActorSystem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ctakes.relationextractor.ae.RelationExtractorAnnotator;
+import org.apache.ctakes.typesystem.type.relation.LocationOfTextRelation;
+import org.apache.ctakes.typesystem.type.textsem.MedicationMention;
+import org.apache.ctakes.typesystem.type.textsem.SignSymptomMention;
+import org.apache.ctakes.typesystem.type.textspan.Segment;
 import org.apache.uima.UIMAException;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.cas.CAS;
@@ -46,7 +51,7 @@ public class CtakesService {
 	private static Log log = LogFactory.getLog(CtakesService.class);
 
 	public final JCas jcas;
-	public final AnalysisEngineDescription aed;
+	public final AnalysisEngineDescription aed,red;
 
 	
 //	private String pipeline = "FAST";
@@ -58,6 +63,7 @@ public class CtakesService {
 	public CtakesService() throws Exception {
 		jcas = JCasFactory.createJCas();
 		aed = MyPipeline.getAggregateBuilder();
+		red = MyPipeline.getRelationBuilder();
 	}
 
 	@CacheEvict(allEntries = true)
@@ -66,10 +72,10 @@ public class CtakesService {
 
 	@Cacheable(value = "ctakes")
 	public String Jcas2json(String note) throws Exception {
-	
 		jcas.reset();
 		jcas.setDocumentText(note);
 		SimplePipeline.runPipeline(jcas, aed);
+		SimplePipeline.runPipeline(jcas, red);
 		CAS cas = jcas.getCas();
 		JsonCasSerializer jcs = new JsonCasSerializer();
 		jcs.setPrettyPrint(true);
@@ -98,11 +104,20 @@ public class CtakesService {
 		
 		
 		//alihur edits - obj = (JSONObject) obj.get("_InitialView");
+		
 		JSONArray StrengthAnnotation = (JSONArray) obj.get("StrengthAnnotation");
 		JSONArray FormAnnotation = (JSONArray) obj.get("FormAnnotation");
 		JSONArray MeasurementAnnotation = (JSONArray) obj.get("MeasurementAnnotation");
 		JSONArray DrugChangeStatusAnnotation = (JSONArray) obj.get("DrugChangeStatusAnnotation");
 		JSONArray MedicationMention = (JSONArray) obj.get("MedicationMention");
+		
+		//Sana's edit: Debugging 
+		Collection<org.apache.ctakes.typesystem.type.textsem.MedicationMention> mm= JCasUtil.select(jcas, MedicationMention.class); 
+		Collection<org.apache.ctakes.typesystem.type.textsem.SignSymptomMention> ss= JCasUtil.select(jcas, SignSymptomMention.class);
+		Collection<org.apache.ctakes.typesystem.type.relation.LocationOfTextRelation>loc_of=JCasUtil.select(jcas, LocationOfTextRelation.class);
+		
+		// --
+		
 		JSONArray AnatomicalSiteMention = (JSONArray) obj.get("AnatomicalSiteMention");
 		JSONArray DiseaseDisorderMention = (JSONArray) obj.get("DiseaseDisorderMention");
 		JSONArray SignSymptomMention = (JSONArray) obj.get("SignSymptomMention");
@@ -110,7 +125,7 @@ public class CtakesService {
 		JSONArray WordToken = (JSONArray) obj.get("WordToken");
 
 		JSONObject output = new JSONObject();
-	
+	RelationExtractorAnnotator
 	//Sana's Edits 
 		// this is only needed to show you original text in the following annotations. You can add other annotation types too. 		
 		// Note: all these changes are made in 'initial_view' obj in order to show others annotations too
@@ -137,12 +152,12 @@ public class CtakesService {
 		
 		output.put("Original", obj);
 			
-		return output.toJSONString();
+		//return output.toJSONString();
 		
 		
 		// for relation references, CAS_Top object is needed. uncomment this line in that case 
 		
-	//	return ctakes;      
+		return ctakes;      
 	}
 
 	private JSONArray parseJsonMention(String document, JSONArray wordtoken, JSONArray jsonArray) throws Exception {
