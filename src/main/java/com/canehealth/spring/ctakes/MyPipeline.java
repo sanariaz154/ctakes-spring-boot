@@ -72,6 +72,23 @@ import com.google.common.collect.Lists;
 
 public class MyPipeline {	
 
+	//Sana's Edit: Relation pipeline
+	public static AnalysisEngineDescription getRelationBuilder() throws Exception {
+		AggregateBuilder builder = new AggregateBuilder();
+		// builder.add( AnalysisEngineFactory.createEngineDescription( RelationExtractorAnnotator.class ) );	
+	  //   builder.add( AnalysisEngineFactory.createEngineDescription( DegreeOfRelationExtractorAnnotator.class ) );
+	   //  builder.add( AnalysisEngineFactory.createEngineDescription( LocationOfRelationExtractorAnnotator.class ) );
+	    
+		builder.add( AnalysisEngineFactory.createEngineDescription( "desc/ctakes-relation-extractor/desc/analysis_engine/DegreeOfRelationExtractorAnnotator") );
+		builder.add( AnalysisEngineFactory.createEngineDescription( "desc/ctakes-relation-extractor/desc/analysis_engine/LocationOfRelationExtractorAnnotator") );
+		
+		
+		return  builder.createAggregateDescription();
+	}
+	// --
+	
+	
+	
 	public static AnalysisEngineDescription getAggregateBuilder() throws Exception {
 		AggregateBuilder builder = new AggregateBuilder();
 		//builder.add(ClinicalPipelineFactory.getFastPipeline());
@@ -103,12 +120,11 @@ public class MyPipeline {
 	      builder.add( AnalysisEngineFactory.createEngineDescription( ConstituencyParser.class ) );
 	      
 	      // new edit {relation}
-	      builder.add(BackwardsTimeAnnotator
-					.createAnnotatorDescription("/org/apache/ctakes/relationextractor/models/degree_of/model.jar"));
-	      builder.add(BackwardsTimeAnnotator
-					.createAnnotatorDescription("/org/apache/ctakes/relationextractor/models/location_of/model.jar"));
+	   //   builder.add( AnalysisEngineFactory.createEngineDescription( DegreeOfRelationExtractorAnnotator.class ) );
+	    //  builder.add( AnalysisEngineFactory.createEngineDescription( LocationOfRelationExtractorAnnotator.class ) );
+	     
 	      
-	      builder.add( AnalysisEngineFactory.createEngineDescription( RelationExtractorConsumer.class ) );
+	     // builder.add( AnalysisEngineFactory.createEngineDescription( RelationExtractorConsumer.class ) );
 	     	// Add BackwardsTimeAnnotator
 			builder.add(BackwardsTimeAnnotator
 					.createAnnotatorDescription("/org/apache/ctakes/temporal/ae/timeannotator/model.jar"));
@@ -135,6 +151,9 @@ public class MyPipeline {
 //	      builder.add( ConditionalCleartkAnalysisEngine.createAnnotatorDescription() );
 //	      builder.add( GenericCleartkAnalysisEngine.createAnnotatorDescription() );
 //	      builder.add( SubjectCleartkAnalysisEngine.createAnnotatorDescription() );	
+			
+			
+			
 			
 		return builder.createAggregateDescription();
 	}
